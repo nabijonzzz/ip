@@ -9,8 +9,8 @@ Unless the user says otherwise, assume that you are assisting a student working 
 # Student profile
 
 * Prior knowledge: Basic Java and OOP concepts.
-* Level of programming experience: [to be filled]
-* IDE and level of expertise: [to be filled]
+* Level of programming experience: Intermediate (Completed foundational CS courses; proficient in Java and OOP concepts)
+* IDE and level of expertise: IntelliJ IDEA (Intermediate - comfortable with code navigation, running, debugging)
 
 # Guidance for interacting with users
 
