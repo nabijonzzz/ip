@@ -1,5 +1,12 @@
 import java.util.Scanner;
 
+/**
+ * Echo is a command-line chatbot that manages a simple task list.
+ *
+ * <p>After greeting the user it repeatedly reads one line of input and acts on it:
+ * {@code list} prints all tasks, {@code mark <n>} / {@code unmark <n>} change a
+ * task's done status, {@code bye} exits, and any other text is stored as a new task.
+ */
 public class Echo {
     private static final String LINE = "____________________________________________________________";
     private static final String BANNER = " _____ ____ _   _  ___  \n"
@@ -9,7 +16,7 @@ public class Echo {
             + "|_____\\____|_| |_|\\___/ \n";
     private static final String NAME = "Echo";
 
-    private static final String[] tasks = new String[100];
+    private static final Task[] tasks = new Task[100];
     private static int taskCount = 0;
 
     public static void main(String[] args) {
@@ -20,9 +27,12 @@ public class Echo {
             String userInput = scanner.nextLine();
             if (userInput.equals("bye")) {
                 break;
-            }
-            if (userInput.equals("list")) {
+            } else if (userInput.equals("list")) {
                 printAllTasks();
+            } else if (userInput.startsWith("mark ")) {
+                markTask(Integer.parseInt(userInput.substring("mark ".length()).trim()));
+            } else if (userInput.startsWith("unmark ")) {
+                unmarkTask(Integer.parseInt(userInput.substring("unmark ".length()).trim()));
             } else {
                 addTask(userInput);
             }
@@ -42,28 +52,51 @@ public class Echo {
     }
 
     /**
-     * Adds task to the task list and increments the task counter"
+     * Stores a new task and confirms it to the user.
      *
-     * @param task new task added by user
+     * @param description text of the task entered by the user
      */
-    private static void addTask(String task) {
-        tasks[taskCount] = task;
+    private static void addTask(String description) {
+        tasks[taskCount] = new Task(description);
         taskCount++;
-        printMessage("added: " + task);
+        printMessage("added: " + description);
     }
 
     /**
-     * Prints the list of the tasks when user inputs the word list
+     * Prints every stored task as a numbered list, in response to the
+     * {@code list} command.
      */
     private static void printAllTasks() {
-        StringBuilder numberedList = new StringBuilder();
+        StringBuilder taskList = new StringBuilder("Here are the tasks in your list:");
         for (int i = 0; i < taskCount; i++) {
-            numberedList.append(i + 1).append(". ").append(tasks[i]);
-            if (i < taskCount - 1) {
-                numberedList.append(System.lineSeparator());
-            }
+            taskList.append(System.lineSeparator())
+                    .append(i + 1).append(".").append(tasks[i]);
         }
-        printMessage(numberedList.toString());
+        printMessage(taskList.toString());
+    }
+
+    /**
+     * Marks the task at the given list position as done.
+     *
+     * @param taskNumber 1-based position shown by the list command
+     */
+    private static void markTask(int taskNumber) {
+        Task task = tasks[taskNumber - 1];
+        task.markAsDone();
+        printMessage("Nice! I've marked this task as done:" + System.lineSeparator()
+                + "  " + task);
+    }
+
+    /**
+     * Marks the task at the given list position as not done.
+     *
+     * @param taskNumber 1-based position shown by the list command
+     */
+    private static void unmarkTask(int taskNumber) {
+        Task task = tasks[taskNumber - 1];
+        task.markAsNotDone();
+        printMessage("OK, I've marked this task as not done yet:" + System.lineSeparator()
+                + "  " + task);
     }
 
     /**
