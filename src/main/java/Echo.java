@@ -9,16 +9,23 @@ public class Echo {
             + "|_____\\____|_| |_|\\___/ \n";
     private static final String NAME = "Echo";
 
+    private static final String[] tasks = new String[100];
+    private static int taskCount = 0;
+
     public static void main(String[] args) {
         printGreeting();
         Scanner scanner = new Scanner(System.in);
 
-        while(scanner.hasNextLine()) {
+        while (scanner.hasNextLine()) {
             String userInput = scanner.nextLine();
-            if(userInput.equals("bye")) {
+            if (userInput.equals("bye")) {
                 break;
             }
-            printMessage(userInput);
+            if (userInput.equals("list")) {
+                printAllTasks();
+            } else {
+                addTask(userInput);
+            }
         }
         printMessage("Bye. Hope to see you again soon!");
     }
@@ -32,6 +39,31 @@ public class Echo {
         System.out.println("Hello! I'm " + NAME + ".");
         System.out.println("What can I do for you?");
         System.out.println(LINE);
+    }
+
+    /**
+     * Adds task to the task list and increments the task counter"
+     *
+     * @param task new task added by user
+     */
+    private static void addTask(String task) {
+        tasks[taskCount] = task;
+        taskCount++;
+        printMessage("added: " + task);
+    }
+
+    /**
+     * Prints the list of the tasks when user inputs the word list
+     */
+    private static void printAllTasks() {
+        StringBuilder numberedList = new StringBuilder();
+        for (int i = 0; i < taskCount; i++) {
+            numberedList.append(i + 1).append(". ").append(tasks[i]);
+            if (i < taskCount - 1) {
+                numberedList.append(System.lineSeparator());
+            }
+        }
+        printMessage(numberedList.toString());
     }
 
     /**
