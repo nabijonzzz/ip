@@ -16,7 +16,9 @@ public class Echo {
             + "|_____\\____|_| |_|\\___/ \n";
     private static final String NAME = "Echo";
 
-    private static final Task[] tasks = new Task[100];
+    /** Maximum number of tasks the list can hold. */
+    private static final int MAX_TASKS = 100;
+    private static final Task[] tasks = new Task[MAX_TASKS];
     private static int taskCount = 0;
 
     public static void main(String[] args) {
@@ -41,7 +43,7 @@ public class Echo {
     }
 
     /**
-     * Prints a Greeting message with ECHO banner
+     * Prints the greeting banner and the welcome message.
      */
     private static void printGreeting() {
         System.out.println(LINE);
@@ -54,7 +56,7 @@ public class Echo {
     /**
      * Stores a new task and confirms it to the user.
      *
-     * @param description text of the task entered by the user
+     * @param description text of the task entered by the user.
      */
     private static void addTask(String description) {
         tasks[taskCount] = new Task(description);
@@ -78,7 +80,7 @@ public class Echo {
     /**
      * Marks the task at the given list position as done.
      *
-     * @param taskNumber 1-based position shown by the list command
+     * @param taskNumber 1-based position shown by the list command.
      */
     private static void markTask(int taskNumber) {
         Task task = tasks[taskNumber - 1];
@@ -90,7 +92,7 @@ public class Echo {
     /**
      * Marks the task at the given list position as not done.
      *
-     * @param taskNumber 1-based position shown by the list command
+     * @param taskNumber 1-based position shown by the list command.
      */
     private static void unmarkTask(int taskNumber) {
         Task task = tasks[taskNumber - 1];
@@ -100,14 +102,13 @@ public class Echo {
     }
 
     /**
-     * Prints message in between two lines
+     * Prints a message framed between two divider lines.
      *
-     * @param message message to display
+     * @param message text to display between the dividers.
      */
     private static void printMessage(String message) {
         System.out.println(LINE);
         System.out.println(message);
         System.out.println(LINE);
     }
-
 }
