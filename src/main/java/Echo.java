@@ -4,8 +4,9 @@ import java.util.Scanner;
  * Echo is a command-line chatbot that manages a simple task list.
  *
  * <p>After greeting the user it repeatedly reads one line of input and acts on it:
- * {@code list} prints all tasks, {@code mark <n>} / {@code unmark <n>} change a
- * task's done status, {@code bye} exits, and any other text is stored as a new task.
+ * {@code todo}, {@code deadline ... /by ...} and {@code event ... /from ... /to ...}
+ * add tasks, {@code list} prints them, {@code mark <n>} / {@code unmark <n>} change a
+ * task's done status, and {@code bye} exits.
  */
 public class Echo {
     private static final String LINE = "____________________________________________________________";
@@ -35,8 +36,14 @@ public class Echo {
                 markTask(Integer.parseInt(userInput.substring("mark ".length()).trim()));
             } else if (userInput.startsWith("unmark ")) {
                 unmarkTask(Integer.parseInt(userInput.substring("unmark ".length()).trim()));
+            } else if (userInput.startsWith("todo ")) {
+                addTask(new Todo(userInput.substring("todo ".length()).trim()));
+            } else if (userInput.startsWith("deadline ")) {
+                addTask(parseDeadline(userInput.substring("deadline ".length())));
+            } else if (userInput.startsWith("event ")) {
+                addTask(parseEvent(userInput.substring("event ".length())));
             } else {
-                addTask(userInput);
+                addTask(new Task(userInput));
             }
         }
         printMessage("Bye. Hope to see you again soon!");
@@ -54,14 +61,41 @@ public class Echo {
     }
 
     /**
-     * Stores a new task and confirms it to the user.
+     * Stores a task and confirms it to the user with the running total.
      *
-     * @param description text of the task entered by the user.
+     * @param task the task to add.
      */
-    private static void addTask(String description) {
-        tasks[taskCount] = new Task(description);
+    private static void addTask(Task task) {
+        tasks[taskCount] = task;
         taskCount++;
-        printMessage("added: " + description);
+        printMessage("Got it. I've added this task:" + System.lineSeparator()
+                + "  " + task + System.lineSeparator()
+                + "Now you have " + taskCount + " tasks in the list.");
+    }
+
+    /**
+     * Parses the text after {@code deadline }, of the form
+     * {@code <description> /by <when>}.
+     *
+     * @param arguments command text with the command word removed.
+     * @return the parsed deadline.
+     */
+    private static Deadline parseDeadline(String arguments) {
+        String[] parts = arguments.split(" /by ", 2);
+        return new Deadline(parts[0].trim(), parts[1].trim());
+    }
+
+    /**
+     * Parses the text after {@code event }, of the form
+     * {@code <description> /from <start> /to <end>}.
+     *
+     * @param arguments command text with the command word removed.
+     * @return the parsed event.
+     */
+    private static Event parseEvent(String arguments) {
+        String[] fromParts = arguments.split(" /from ", 2);
+        String[] toParts = fromParts[1].split(" /to ", 2);
+        return new Event(fromParts[0].trim(), toParts[0].trim(), toParts[1].trim());
     }
 
     /**
