@@ -30,23 +30,34 @@ public class Echo {
             String userInput = scanner.nextLine();
             if (userInput.equals("bye")) {
                 break;
-            } else if (userInput.equals("list")) {
-                printAllTasks();
-            } else if (userInput.startsWith("mark ")) {
-                markTask(Integer.parseInt(userInput.substring("mark ".length()).trim()));
-            } else if (userInput.startsWith("unmark ")) {
-                unmarkTask(Integer.parseInt(userInput.substring("unmark ".length()).trim()));
-            } else if (userInput.startsWith("todo ")) {
-                addTask(new Todo(userInput.substring("todo ".length()).trim()));
-            } else if (userInput.startsWith("deadline ")) {
-                addTask(parseDeadline(userInput.substring("deadline ".length())));
-            } else if (userInput.startsWith("event ")) {
-                addTask(parseEvent(userInput.substring("event ".length())));
-            } else {
-                addTask(new Task(userInput));
             }
+            handleCommand(userInput);
         }
         printMessage("Bye. Hope to see you again soon!");
+    }
+
+    /**
+     * Dispatches one command line to its handler. The caller has already
+     * checked for {@code bye}, so that command is not handled here.
+     *
+     * @param userInput the full line the user typed.
+     */
+    private static void handleCommand(String userInput) {
+        if (userInput.equals("list")) {
+            printAllTasks();
+        } else if (userInput.startsWith("mark ")) {
+            markTask(Integer.parseInt(userInput.substring("mark ".length()).trim()));
+        } else if (userInput.startsWith("unmark ")) {
+            unmarkTask(Integer.parseInt(userInput.substring("unmark ".length()).trim()));
+        } else if (userInput.startsWith("todo ")) {
+            addTask(new Todo(userInput.substring("todo ".length()).trim()));
+        } else if (userInput.startsWith("deadline ")) {
+            addTask(parseDeadline(userInput.substring("deadline ".length())));
+        } else if (userInput.startsWith("event ")) {
+            addTask(parseEvent(userInput.substring("event ".length())));
+        } else {
+            addTask(new Task(userInput));
+        }
     }
 
     /**
