@@ -1,3 +1,5 @@
+package echo;
+
 /**
  * Represents an event: a task that spans a start and an end date/time.
  * Both are kept as free text.

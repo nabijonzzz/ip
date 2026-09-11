@@ -1,3 +1,5 @@
+package echo;
+
 /**
  * Signals that user input could not be understood or acted on.
  * The message carries a plain-English explanation shown to the user,
