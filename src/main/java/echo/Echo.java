@@ -1,3 +1,5 @@
+package echo;
+
 import java.util.Scanner;
 
 /**

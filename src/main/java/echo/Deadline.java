@@ -1,3 +1,5 @@
+package echo;
+
 /**
  * Represents a deadline: a task that must be done by a certain date/time.
  * The date/time is kept as free text.

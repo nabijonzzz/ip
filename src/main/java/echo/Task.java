@@ -1,3 +1,5 @@
+package echo;
+
 /**
  * Represents a single task in the task list.
  * A task has a description and a status showing whether it is done.
