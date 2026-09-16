@@ -1,5 +1,6 @@
 package echo;
 
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -11,7 +12,8 @@ import java.util.Scanner;
  * {@code todo}, {@code deadline ... /by ...} and {@code event ... /from ... /to ...}
  * add tasks, {@code list} prints them, {@code mark <n>} / {@code unmark <n>} change a
  * task's done status, {@code delete <n>} removes a task, and {@code bye} exits.
- * Invalid input is reported as an error instead of crashing the program.
+ * Invalid input is reported as an error instead of crashing the program. The
+ * task list is saved to disk after every change and reloaded at startup.
  */
 public class Echo {
     private static final String LINE = "____________________________________________________________";
@@ -23,9 +25,11 @@ public class Echo {
     private static final String NAME = "Echo";
 
     private static final List<Task> tasks = new ArrayList<>();
+    private static final Storage storage = new Storage("data/echo.txt");
 
     public static void main(String[] args) {
         printGreeting();
+        loadTasks();
         Scanner scanner = new Scanner(System.in);
 
         while (scanner.hasNextLine()) {
@@ -91,6 +95,7 @@ public class Echo {
         printMessage("Got it. I've added this task:" + System.lineSeparator()
                 + "  " + task + System.lineSeparator()
                 + "Now you have " + tasks.size() + " tasks in the list.");
+        saveTasks();
     }
 
     /**
@@ -104,6 +109,27 @@ public class Echo {
         printMessage("Noted. I've removed this task:" + System.lineSeparator()
                 + "  " + removed + System.lineSeparator()
                 + "Now you have " + tasks.size() + " tasks in the list.");
+        saveTasks();
+    }
+
+    /**
+     * Loads previously saved tasks (if any) into the in-memory list at startup.
+     */
+    private static void loadTasks() {
+        tasks.addAll(storage.load());
+    }
+
+    /**
+     * Persists the current task list to disk. A failure is reported to the
+     * user rather than crashing the program -- the in-memory list is still
+     * intact even if the save itself did not succeed.
+     */
+    private static void saveTasks() {
+        try {
+            storage.save(tasks);
+        } catch (UncheckedIOException e) {
+            printMessage("OOPS!!! Could not save your tasks: " + e.getCause().getMessage());
+        }
     }
 
     /**
@@ -225,6 +251,7 @@ public class Echo {
         task.markAsDone();
         printMessage("Nice! I've marked this task as done:" + System.lineSeparator()
                 + "  " + task);
+        saveTasks();
     }
 
     /**
@@ -237,6 +264,7 @@ public class Echo {
         task.markAsNotDone();
         printMessage("OK, I've marked this task as not done yet:" + System.lineSeparator()
                 + "  " + task);
+        saveTasks();
     }
 
     /**
