@@ -1,5 +1,7 @@
 package echo;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -8,8 +10,8 @@ import java.util.Scanner;
  * <p>After greeting the user it repeatedly reads one line of input and acts on it:
  * {@code todo}, {@code deadline ... /by ...} and {@code event ... /from ... /to ...}
  * add tasks, {@code list} prints them, {@code mark <n>} / {@code unmark <n>} change a
- * task's done status, and {@code bye} exits. Invalid input is reported as an error
- * instead of crashing the program.
+ * task's done status, {@code delete <n>} removes a task, and {@code bye} exits.
+ * Invalid input is reported as an error instead of crashing the program.
  */
 public class Echo {
     private static final String LINE = "____________________________________________________________";
@@ -20,10 +22,7 @@ public class Echo {
             + "|_____\\____|_| |_|\\___/ \n";
     private static final String NAME = "Echo";
 
-    /** Maximum number of tasks the list can hold. */
-    private static final int MAX_TASKS = 100;
-    private static final Task[] tasks = new Task[MAX_TASKS];
-    private static int taskCount = 0;
+    private static final List<Task> tasks = new ArrayList<>();
 
     public static void main(String[] args) {
         printGreeting();
@@ -58,6 +57,8 @@ public class Echo {
             markTask(parseTaskNumber(userInput, "mark"));
         } else if (userInput.equals("unmark") || userInput.startsWith("unmark ")) {
             unmarkTask(parseTaskNumber(userInput, "unmark"));
+        } else if (userInput.equals("delete") || userInput.startsWith("delete ")) {
+            deleteTask(parseTaskNumber(userInput, "delete"));
         } else if (userInput.equals("todo") || userInput.startsWith("todo ")) {
             addTask(new Todo(requireDescription(userInput, "todo", "a todo")));
         } else if (userInput.equals("deadline") || userInput.startsWith("deadline ")) {
@@ -84,17 +85,25 @@ public class Echo {
      * Stores a task and confirms it to the user with the running total.
      *
      * @param task the task to add.
-     * @throws EchoException if the list is already full.
      */
-    private static void addTask(Task task) throws EchoException {
-        if (taskCount >= MAX_TASKS) {
-            throw new EchoException("The task list is full (max " + MAX_TASKS + " tasks).");
-        }
-        tasks[taskCount] = task;
-        taskCount++;
+    private static void addTask(Task task) {
+        tasks.add(task);
         printMessage("Got it. I've added this task:" + System.lineSeparator()
                 + "  " + task + System.lineSeparator()
-                + "Now you have " + taskCount + " tasks in the list.");
+                + "Now you have " + tasks.size() + " tasks in the list.");
+    }
+
+    /**
+     * Removes the task at the given list position and confirms it to the user
+     * with the running total.
+     *
+     * @param taskNumber 1-based position shown by the list command.
+     */
+    private static void deleteTask(int taskNumber) {
+        Task removed = tasks.remove(taskNumber - 1);
+        printMessage("Noted. I've removed this task:" + System.lineSeparator()
+                + "  " + removed + System.lineSeparator()
+                + "Now you have " + tasks.size() + " tasks in the list.");
     }
 
     /**
@@ -171,18 +180,18 @@ public class Echo {
      */
     private static void printAllTasks() {
         StringBuilder taskList = new StringBuilder("Here are the tasks in your list:");
-        for (int i = 0; i < taskCount; i++) {
+        for (int i = 0; i < tasks.size(); i++) {
             taskList.append(System.lineSeparator())
-                    .append(i + 1).append(".").append(tasks[i]);
+                    .append(i + 1).append(".").append(tasks.get(i));
         }
         printMessage(taskList.toString());
     }
 
     /**
-     * Parses and validates the task number after {@code mark}/{@code unmark}.
+     * Parses and validates the task number after {@code mark}/{@code unmark}/{@code delete}.
      *
      * @param userInput the full command line, e.g. {@code "mark 2"}.
-     * @param command   the command word, {@code "mark"} or {@code "unmark"}.
+     * @param command   the command word, e.g. {@code "mark"}, {@code "unmark"} or {@code "delete"}.
      * @return the 1-based task number, guaranteed to point at an existing task.
      * @throws EchoException if the number is missing, not a number, or out of range.
      */
@@ -200,7 +209,7 @@ public class Echo {
         } catch (NumberFormatException e) {
             throw new EchoException("\"" + argument + "\" is not a task number.");
         }
-        if (taskNumber < 1 || taskNumber > taskCount) {
+        if (taskNumber < 1 || taskNumber > tasks.size()) {
             throw new EchoException("There is no task number " + taskNumber + " in the list.");
         }
         return taskNumber;
@@ -212,7 +221,7 @@ public class Echo {
      * @param taskNumber 1-based position shown by the list command.
      */
     private static void markTask(int taskNumber) {
-        Task task = tasks[taskNumber - 1];
+        Task task = tasks.get(taskNumber - 1);
         task.markAsDone();
         printMessage("Nice! I've marked this task as done:" + System.lineSeparator()
                 + "  " + task);
@@ -224,7 +233,7 @@ public class Echo {
      * @param taskNumber 1-based position shown by the list command.
      */
     private static void unmarkTask(int taskNumber) {
-        Task task = tasks[taskNumber - 1];
+        Task task = tasks.get(taskNumber - 1);
         task.markAsNotDone();
         printMessage("OK, I've marked this task as not done yet:" + System.lineSeparator()
                 + "  " + task);
