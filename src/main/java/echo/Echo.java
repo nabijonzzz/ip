@@ -1,5 +1,6 @@
 package echo;
 
+import java.io.UncheckedIOException;
 import java.util.Scanner;
 
 /**
@@ -25,8 +26,11 @@ public class Echo {
     private static final Task[] tasks = new Task[MAX_TASKS];
     private static int taskCount = 0;
 
+    private static final Storage storage = new Storage("data/echo.txt");
+
     public static void main(String[] args) {
         printGreeting();
+        loadTasks();
         Scanner scanner = new Scanner(System.in);
 
         while (scanner.hasNextLine()) {
@@ -95,6 +99,32 @@ public class Echo {
         printMessage("Got it. I've added this task:" + System.lineSeparator()
                 + "  " + task + System.lineSeparator()
                 + "Now you have " + taskCount + " tasks in the list.");
+        saveTasks();
+    }
+
+    /**
+     * Loads previously saved tasks (if any) into the in-memory list at startup.
+     */
+    private static void loadTasks() {
+        for (Task task : storage.load()) {
+            if (taskCount < MAX_TASKS) {
+                tasks[taskCount] = task;
+                taskCount++;
+            }
+        }
+    }
+
+    /**
+     * Persists the current task list to disk. A failure is reported to the
+     * user rather than crashing the program -- the in-memory list is still
+     * intact even if the save itself did not succeed.
+     */
+    private static void saveTasks() {
+        try {
+            storage.save(tasks, taskCount);
+        } catch (UncheckedIOException e) {
+            printMessage("OOPS!!! Could not save your tasks: " + e.getCause().getMessage());
+        }
     }
 
     /**
@@ -216,6 +246,7 @@ public class Echo {
         task.markAsDone();
         printMessage("Nice! I've marked this task as done:" + System.lineSeparator()
                 + "  " + task);
+        saveTasks();
     }
 
     /**
@@ -228,6 +259,7 @@ public class Echo {
         task.markAsNotDone();
         printMessage("OK, I've marked this task as not done yet:" + System.lineSeparator()
                 + "  " + task);
+        saveTasks();
     }
 
     /**

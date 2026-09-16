@@ -37,4 +37,13 @@ public class Task {
         String statusIcon = isDone ? "X" : " ";
         return "[" + statusIcon + "] " + description;
     }
+
+    /**
+     * Returns this task's save-file fields -- whether it is done, then the
+     * description -- separated by {@code " | "}. Subclasses prepend their
+     * type letter and append their own fields.
+     */
+    protected String toSaveFormat() {
+        return (isDone ? "1" : "0") + " | " + description;
+    }
 }
