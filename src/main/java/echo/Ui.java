@@ -5,6 +5,8 @@ import java.util.Scanner;
 
 /**
  * Handles all interaction with the user: printing messages and reading input.
+ * Responses to commands are printed without divider lines; the caller frames
+ * each response with {@link #showLine()}.
  */
 public class Ui {
     private static final String LINE = "____________________________________________________________";
@@ -17,11 +19,18 @@ public class Ui {
 
     private final Scanner scanner = new Scanner(System.in);
 
-    /** Prints the greeting banner and the welcome message. */
+    /** Prints the greeting banner and the welcome message, framed by divider lines. */
     public void showGreeting() {
+        showLine();
         showMessage(BANNER + System.lineSeparator()
                 + "Hello! I'm " + NAME + "." + System.lineSeparator()
                 + "What can I do for you?");
+        showLine();
+    }
+
+    /** Prints a divider line. */
+    public void showLine() {
+        System.out.println(LINE);
     }
 
     /** Prints the farewell message. */
@@ -99,13 +108,11 @@ public class Ui {
     }
 
     /**
-     * Prints a message framed between two divider lines.
+     * Prints a message as-is, without divider lines.
      *
-     * @param message text to display between the dividers.
+     * @param message text to display.
      */
-    public void showMessage(String message) {
-        System.out.println(LINE);
+    private void showMessage(String message) {
         System.out.println(message);
-        System.out.println(LINE);
     }
 }

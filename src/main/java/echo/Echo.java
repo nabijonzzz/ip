@@ -37,11 +37,14 @@ public class Echo {
         while (!isExit) {
             try {
                 String fullCommand = ui.readCommand();
+                ui.showLine();
                 Command command = Parser.parse(fullCommand);
                 command.execute(tasks, ui, storage);
                 isExit = command.isExit();
             } catch (EchoException e) {
                 ui.showError(e.getMessage());
+            } finally {
+                ui.showLine();
             }
         }
     }
