@@ -28,6 +28,7 @@ public class Deadline extends Task {
         return "[D]" + super.toString() + " (by: " + Dates.format(by) + ")";
     }
 
+    /** Returns this deadline's save-file line, e.g. {@code D | 0 | return book | 2019-10-15}. */
     @Override
     protected String toSaveFormat() {
         return "D | " + super.toSaveFormat() + " | " + by;

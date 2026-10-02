@@ -32,6 +32,7 @@ public class Event extends Task {
                 + " (from: " + Dates.format(from) + " to: " + Dates.format(to) + ")";
     }
 
+    /** Returns this event's save-file line, e.g. {@code E | 0 | fair | 2019-10-14 | 2019-10-16}. */
     @Override
     protected String toSaveFormat() {
         return "E | " + super.toSaveFormat() + " | " + from + " | " + to;

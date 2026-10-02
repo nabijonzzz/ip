@@ -9,6 +9,7 @@ import java.time.LocalDate;
  */
 public class Parser {
 
+    /** Prevents instantiation: this class only has static methods. */
     private Parser() {
     }
 

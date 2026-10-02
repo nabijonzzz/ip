@@ -22,6 +22,7 @@ public class Todo extends Task {
         return "[T]" + super.toString();
     }
 
+    /** Returns this to-do's save-file line, e.g. {@code T | 1 | read book}. */
     @Override
     protected String toSaveFormat() {
         return "T | " + super.toSaveFormat();

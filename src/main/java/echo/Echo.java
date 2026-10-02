@@ -52,6 +52,12 @@ public class Echo {
         }
     }
 
+    /**
+     * Starts the chatbot, saving to and loading from {@code data/echo.txt}
+     * relative to the folder it is run from.
+     *
+     * @param args not used.
+     */
     public static void main(String[] args) {
         new Echo("data/echo.txt").run();
     }

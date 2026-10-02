@@ -15,6 +15,7 @@ public class Dates {
     private static final DateTimeFormatter DISPLAY_FORMAT =
             DateTimeFormatter.ofPattern("MMM dd yyyy", Locale.ENGLISH);
 
+    /** Prevents instantiation: this class only has static methods. */
     private Dates() {
     }
 

@@ -13,6 +13,11 @@ public class UnmarkCommand extends Command {
         this.taskNumber = taskNumber;
     }
 
+    /**
+     * Marks the task as not done, confirms it to the user and saves the list.
+     *
+     * @throws EchoException if there is no task with this number.
+     */
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) throws EchoException {
         checkTaskNumber(tasks, taskNumber);
