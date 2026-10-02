@@ -34,6 +34,18 @@ public class Ui {
         System.out.println(LINE);
     }
 
+    /**
+     * Tells the user, framed by divider lines, that saved tasks could not be
+     * loaded and the chatbot is starting with an empty list.
+     *
+     * @param reason why loading failed.
+     */
+    public void showLoadingError(String reason) {
+        showLine();
+        showMessage("OOPS!!! " + reason + " Starting with an empty list.");
+        showLine();
+    }
+
     /** Prints the farewell message. */
     public void showGoodbye() {
         showMessage("Bye. Hope to see you again soon!");

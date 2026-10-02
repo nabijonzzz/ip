@@ -20,14 +20,22 @@ public class Echo {
 
     /**
      * Creates an Echo chatbot backed by the given save file, loading any
-     * tasks already saved there.
+     * tasks already saved there. If the file cannot be read, the user is told
+     * and the chatbot starts with an empty list instead of crashing.
      *
      * @param filePath path (relative to the project root) of the save file.
      */
     public Echo(String filePath) {
         ui = new Ui();
         storage = new Storage(filePath);
-        tasks = new TaskList(storage.load());
+        TaskList loadedTasks;
+        try {
+            loadedTasks = new TaskList(storage.load());
+        } catch (EchoException e) {
+            ui.showLoadingError(e.getMessage());
+            loadedTasks = new TaskList();
+        }
+        tasks = loadedTasks;
     }
 
     /**

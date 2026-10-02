@@ -30,8 +30,9 @@ public class Storage {
      * unparsable content) is skipped rather than failing the whole load.
      *
      * @return the tasks found in the save file, in file order.
+     * @throws EchoException if the save file exists but cannot be read, e.g. no read permission.
      */
-    public List<Task> load() {
+    public List<Task> load() throws EchoException {
         List<Task> loaded = new ArrayList<>();
         if (!Files.exists(filePath)) {
             return loaded;
@@ -44,7 +45,7 @@ public class Storage {
                 }
             }
         } catch (IOException e) {
-            throw new UncheckedIOException("Could not read " + filePath, e);
+            throw new EchoException("Could not read your saved tasks from " + filePath + ".");
         }
         return loaded;
     }
