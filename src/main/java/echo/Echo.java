@@ -1,8 +1,6 @@
 package echo;
 
 import java.io.UncheckedIOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Echo is a command-line chatbot that manages a simple task list.
@@ -15,7 +13,7 @@ import java.util.List;
  * task list is saved to disk after every change and reloaded at startup.
  */
 public class Echo {
-    private final List<Task> tasks = new ArrayList<>();
+    private final TaskList tasks;
     private final Storage storage;
     private final Ui ui;
 
@@ -28,7 +26,7 @@ public class Echo {
     public Echo(String filePath) {
         ui = new Ui();
         storage = new Storage(filePath);
-        tasks.addAll(storage.load());
+        tasks = new TaskList(storage.load());
     }
 
     /**
@@ -64,7 +62,7 @@ public class Echo {
      */
     private void handleCommand(String userInput) throws EchoException {
         if (userInput.equals("list")) {
-            ui.showTaskList(tasks);
+            ui.showTaskList(tasks.asList());
         } else if (userInput.equals("mark") || userInput.startsWith("mark ")) {
             markTask(parseTaskNumber(userInput, "mark"));
         } else if (userInput.equals("unmark") || userInput.startsWith("unmark ")) {
@@ -112,7 +110,7 @@ public class Echo {
      */
     private void saveTasks() {
         try {
-            storage.save(tasks);
+            storage.save(tasks.asList());
         } catch (UncheckedIOException e) {
             ui.showError("Could not save your tasks: " + e.getCause().getMessage());
         }

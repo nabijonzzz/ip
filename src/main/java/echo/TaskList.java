@@ -1,0 +1,68 @@
+package echo;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Holds the in-memory list of tasks and the operations to add, remove and
+ * look up tasks in it.
+ */
+public class TaskList {
+    private final List<Task> tasks;
+
+    /** Creates an empty task list. */
+    public TaskList() {
+        this(new ArrayList<>());
+    }
+
+    /**
+     * Creates a task list pre-populated with the given tasks, e.g. ones just
+     * loaded from disk.
+     *
+     * @param tasks the initial tasks, in order.
+     */
+    public TaskList(List<Task> tasks) {
+        this.tasks = new ArrayList<>(tasks);
+    }
+
+    /**
+     * Adds a task to the end of the list.
+     *
+     * @param task the task to add.
+     */
+    public void add(Task task) {
+        tasks.add(task);
+    }
+
+    /**
+     * Removes and returns the task at the given 0-based index.
+     *
+     * @param index position of the task to remove.
+     * @return the removed task.
+     */
+    public Task remove(int index) {
+        return tasks.remove(index);
+    }
+
+    /**
+     * Returns the task at the given 0-based index.
+     *
+     * @param index position of the task.
+     * @return the task at that position.
+     */
+    public Task get(int index) {
+        return tasks.get(index);
+    }
+
+    /** Returns how many tasks are in the list. */
+    public int size() {
+        return tasks.size();
+    }
+
+    /**
+     * Returns the tasks as a plain list, in order, for display or saving.
+     */
+    public List<Task> asList() {
+        return List.copyOf(tasks);
+    }
+}
