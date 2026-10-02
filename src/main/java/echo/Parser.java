@@ -48,13 +48,15 @@ public class Parser {
 
     /**
      * Returns the text after a command word (e.g. {@code "todo "}), rejecting
-     * it if empty.
+     * it if empty or if it contains {@code |}, the field separator of the save
+     * file -- a {@code |} inside a task would split it into the wrong fields
+     * when the file is loaded again.
      *
      * @param userInput      the full command line.
      * @param commandWord    the command word without a trailing space, e.g. {@code "todo"}.
      * @param taskNounPhrase the task kind with its article, e.g. {@code "a todo"}, {@code "an event"}.
      * @return the trimmed, non-empty description.
-     * @throws EchoException if no description follows the command word.
+     * @throws EchoException if no description follows the command word, or it contains {@code |}.
      */
     private static String requireDescription(String userInput, String commandWord, String taskNounPhrase)
             throws EchoException {
@@ -63,6 +65,10 @@ public class Parser {
                 : userInput.substring(commandWord.length() + 1).trim();
         if (description.isEmpty()) {
             throw new EchoException("The description of " + taskNounPhrase + " cannot be empty.");
+        }
+        if (description.contains("|")) {
+            throw new EchoException("Tasks cannot contain the \"|\" character, "
+                    + "because Echo uses it to separate fields in its save file.");
         }
         return description;
     }
