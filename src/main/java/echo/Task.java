@@ -1,5 +1,7 @@
 package echo;
 
+import java.time.LocalDate;
+
 /**
  * Represents a single task in the task list.
  * A task has a description and a status showing whether it is done.
@@ -35,6 +37,16 @@ public class Task {
      */
     public boolean containsKeyword(String keyword) {
         return description.contains(keyword);
+    }
+
+    /**
+     * Returns whether this task falls on the given date. A plain task has no
+     * date, so it never does; subclasses with dates override this.
+     *
+     * @param date the date to check.
+     */
+    public boolean isOn(LocalDate date) {
+        return false;
     }
 
     /**

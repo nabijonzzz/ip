@@ -1,5 +1,6 @@
 package echo;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
 
@@ -72,6 +73,16 @@ public class Ui {
      */
     public void showMatchingTasks(List<Task> matches) {
         showNumberedTasks("Here are the matching tasks in your list:", matches);
+    }
+
+    /**
+     * Prints the tasks found by the {@code on} command, numbered from 1.
+     *
+     * @param date  the date that was checked.
+     * @param tasks the tasks falling on that date, in list order.
+     */
+    public void showTasksOn(LocalDate date, List<Task> tasks) {
+        showNumberedTasks("Here are the tasks on " + Dates.format(date) + ":", tasks);
     }
 
     /**

@@ -1,5 +1,6 @@
 package echo;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,6 +70,23 @@ public class TaskList {
         List<Task> matches = new ArrayList<>();
         for (Task task : tasks) {
             if (task.containsKeyword(keyword)) {
+                matches.add(task);
+            }
+        }
+        return matches;
+    }
+
+    /**
+     * Returns the tasks that fall on the given date (deadlines due that day,
+     * events spanning it), in list order.
+     *
+     * @param date the date to check.
+     * @return the matching tasks, possibly empty.
+     */
+    public List<Task> findOn(LocalDate date) {
+        List<Task> matches = new ArrayList<>();
+        for (Task task : tasks) {
+            if (task.isOn(date)) {
                 matches.add(task);
             }
         }

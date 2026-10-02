@@ -4,9 +4,11 @@ package echo;
  * Echo is a command-line chatbot that manages a simple task list.
  *
  * <p>After greeting the user it repeatedly reads one line of input and acts on it:
- * {@code todo}, {@code deadline ... /by yyyy-mm-dd} and {@code event ... /from ... /to ...}
- * add tasks, {@code list} prints them, {@code find <keyword>} prints the ones whose
- * description contains the keyword, {@code mark <n>} / {@code unmark <n>} change a
+ * {@code todo}, {@code deadline ... /by yyyy-mm-dd} and
+ * {@code event ... /from yyyy-mm-dd /to yyyy-mm-dd} add tasks, {@code list} prints them,
+ * {@code find <keyword>} prints the ones whose description contains the keyword,
+ * {@code on yyyy-mm-dd} prints the deadlines and events on that date,
+ * {@code mark <n>} / {@code unmark <n>} change a
  * task's done status, {@code delete <n>} removes a task, and {@code bye} exits.
  * Invalid input is reported as an error instead of crashing the program. The
  * task list is saved to disk after every change and reloaded at startup.

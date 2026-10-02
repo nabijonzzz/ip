@@ -32,4 +32,14 @@ public class Deadline extends Task {
     protected String toSaveFormat() {
         return "D | " + super.toSaveFormat() + " | " + by;
     }
+
+    /**
+     * Returns whether this deadline is due on the given date.
+     *
+     * @param date the date to check.
+     */
+    @Override
+    public boolean isOn(LocalDate date) {
+        return by.equals(date);
+    }
 }

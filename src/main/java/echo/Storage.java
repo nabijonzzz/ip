@@ -80,7 +80,7 @@ public class Storage {
                 if (fields.length < 5) {
                     return null;
                 }
-                task = new Event(description, fields[3], fields[4]);
+                task = new Event(description, LocalDate.parse(fields[3]), LocalDate.parse(fields[4]));
                 break;
             default:
                 return null;

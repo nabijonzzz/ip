@@ -1,5 +1,7 @@
 package echo;
 
+import java.time.LocalDate;
+
 /**
  * Turns raw user input into a {@link Command} ready to execute. Every method
  * either returns the parsed result or throws {@link EchoException} with a
@@ -24,6 +26,8 @@ public class Parser {
             return new ListCommand();
         } else if (fullCommand.equals("find") || fullCommand.startsWith("find ")) {
             return new FindCommand(parseKeyword(fullCommand));
+        } else if (fullCommand.equals("on") || fullCommand.startsWith("on ")) {
+            return new OnCommand(parseOnDate(fullCommand));
         } else if (fullCommand.equals("mark") || fullCommand.startsWith("mark ")) {
             return new MarkCommand(parseTaskNumber(fullCommand, "mark"));
         } else if (fullCommand.equals("unmark") || fullCommand.startsWith("unmark ")) {
@@ -85,18 +89,19 @@ public class Parser {
 
     /**
      * Parses the text after {@code event }, of the form
-     * {@code <description> /from <start> /to <end>}.
+     * {@code <description> /from <yyyy-mm-dd> /to <yyyy-mm-dd>}.
      *
      * @param userInput the full command line starting with {@code event}.
      * @return the parsed event.
-     * @throws EchoException if the description, {@code /from} or {@code /to} part is missing.
+     * @throws EchoException if the description, {@code /from} or {@code /to} part is missing,
+     *                       a date is invalid, or the event ends before it starts.
      */
     private static Event parseEvent(String userInput) throws EchoException {
         String description = requireDescription(userInput, "event", "an event");
         String[] fromParts = description.split(" /from ", 2);
         if (fromParts.length < 2 || fromParts[1].trim().isEmpty()) {
-            throw new EchoException("An event needs a start and end time, e.g. "
-                    + "\"event meeting /from Mon 2pm /to 4pm\".");
+            throw new EchoException("An event needs a start and end date, e.g. "
+                    + "\"event meeting /from 2019-10-15 /to 2019-10-16\".");
         }
         if (fromParts[0].trim().isEmpty()) {
             throw new EchoException("The description of an event cannot be empty.");
@@ -104,9 +109,31 @@ public class Parser {
         String[] toParts = fromParts[1].split(" /to ", 2);
         if (toParts.length < 2 || toParts[0].trim().isEmpty() || toParts[1].trim().isEmpty()) {
             throw new EchoException("An event needs both /from and /to, e.g. "
-                    + "\"event meeting /from Mon 2pm /to 4pm\".");
+                    + "\"event meeting /from 2019-10-15 /to 2019-10-16\".");
         }
-        return new Event(fromParts[0].trim(), toParts[0].trim(), toParts[1].trim());
+        LocalDate from = Dates.parse(toParts[0].trim());
+        LocalDate to = Dates.parse(toParts[1].trim());
+        if (to.isBefore(from)) {
+            throw new EchoException("An event cannot end before it starts.");
+        }
+        return new Event(fromParts[0].trim(), from, to);
+    }
+
+    /**
+     * Returns the date after {@code on}, rejecting it if empty or invalid.
+     *
+     * @param userInput the full command line starting with {@code on}.
+     * @return the parsed date.
+     * @throws EchoException if no date follows {@code on}, or it is not a valid {@code yyyy-mm-dd} date.
+     */
+    private static LocalDate parseOnDate(String userInput) throws EchoException {
+        String dateText = userInput.equals("on")
+                ? ""
+                : userInput.substring("on ".length()).trim();
+        if (dateText.isEmpty()) {
+            throw new EchoException("Tell me which date to check, e.g. \"on 2019-10-15\".");
+        }
+        return Dates.parse(dateText);
     }
 
     /**
