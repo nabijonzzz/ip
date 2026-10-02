@@ -7,7 +7,9 @@ import java.time.LocalDate;
  * A task has a description and a status showing whether it is done.
  */
 public class Task {
+    /** What the task is about. */
     private final String description;
+    /** Whether the task has been completed. */
     private boolean isDone;
 
     /**
@@ -34,6 +36,7 @@ public class Task {
      * Returns whether this task's description contains the given keyword.
      *
      * @param keyword the text to look for; matching is case-sensitive.
+     * @return {@code true} if the keyword appears in the description.
      */
     public boolean containsKeyword(String keyword) {
         return description.contains(keyword);
@@ -44,6 +47,7 @@ public class Task {
      * date, so it never does; subclasses with dates override this.
      *
      * @param date the date to check.
+     * @return {@code true} if this task falls on {@code date}; always {@code false} here.
      */
     public boolean isOn(LocalDate date) {
         return false;
@@ -63,6 +67,8 @@ public class Task {
      * Returns this task's save-file fields -- whether it is done, then the
      * description -- separated by {@code " | "}. Subclasses prepend their
      * type letter and append their own fields.
+     *
+     * @return the done flag and description, e.g. {@code 1 | read book}.
      */
     protected String toSaveFormat() {
         return (isDone ? "1" : "0") + " | " + description;

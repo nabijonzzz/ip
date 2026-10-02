@@ -4,9 +4,12 @@ package echo;
  * Removes the task at a given list position.
  */
 public class DeleteCommand extends Command {
+    /** 1-based position of the task to remove, as typed by the user. */
     private final int taskNumber;
 
     /**
+     * Creates a command that removes the task at the given position.
+     *
      * @param taskNumber 1-based position shown by the list command.
      */
     public DeleteCommand(int taskNumber) {

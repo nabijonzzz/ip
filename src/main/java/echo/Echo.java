@@ -14,8 +14,11 @@ package echo;
  * task list is saved to disk after every change and reloaded at startup.
  */
 public class Echo {
+    /** The tasks in memory; changed by commands and saved after each change. */
     private final TaskList tasks;
+    /** Reads and writes the save file. */
     private final Storage storage;
+    /** Shows output to and reads input from the user. */
     private final Ui ui;
 
     /**

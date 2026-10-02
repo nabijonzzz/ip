@@ -10,15 +10,23 @@ import java.util.Scanner;
  * each response with {@link #showLine()}.
  */
 public class Ui {
+    /** Divider printed above and below each response. */
     private static final String LINE = "____________________________________________________________";
+    /** ASCII-art logo shown in the greeting. */
     private static final String BANNER = " _____ ____ _   _  ___  \n"
             + "| ____/ ___| | | |/ _ \\ \n"
             + "|  _|| |   | |_| | | | |\n"
             + "| |__| |___|  _  | |_| |\n"
             + "|_____\\____|_| |_|\\___/ \n";
+    /** The chatbot's name, used in the greeting. */
     private static final String NAME = "Echo";
 
+    /** Reads the user's commands from standard input. */
     private final Scanner scanner = new Scanner(System.in);
+
+    /** Creates a Ui that reads commands from standard input and prints to standard output. */
+    public Ui() {
+    }
 
     /** Prints the greeting banner and the welcome message, framed by divider lines. */
     public void showGreeting() {

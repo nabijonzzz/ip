@@ -4,9 +4,12 @@ package echo;
  * Adds a task (to-do, deadline or event) to the task list.
  */
 public class AddCommand extends Command {
+    /** The task to add, already built from the user's input. */
     private final Task task;
 
     /**
+     * Creates a command that adds the given task.
+     *
      * @param task the already-parsed task to add.
      */
     public AddCommand(Task task) {

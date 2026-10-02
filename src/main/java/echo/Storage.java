@@ -14,9 +14,12 @@ import java.util.List;
  * in the pipe-separated format produced by {@link Task#toSaveFormat()}.
  */
 public class Storage {
+    /** Location of the save file, relative to the folder the program is run from. */
     private final Path filePath;
 
     /**
+     * Creates a storage that reads from and writes to the given file.
+     *
      * @param filePath path (relative to the project root) of the save file, e.g. {@code "data/echo.txt"}.
      */
     public Storage(String filePath) {
