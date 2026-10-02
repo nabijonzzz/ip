@@ -5,6 +5,10 @@ package echo;
  */
 public class ExitCommand extends Command {
 
+    /** Creates a command that ends the program. */
+    public ExitCommand() {
+    }
+
     /** Says goodbye to the user. */
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) {

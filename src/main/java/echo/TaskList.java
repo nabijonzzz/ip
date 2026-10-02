@@ -9,6 +9,7 @@ import java.util.List;
  * look up tasks in it.
  */
 public class TaskList {
+    /** The tasks, in the order they were added. */
     private final List<Task> tasks;
 
     /** Creates an empty task list. */
@@ -55,7 +56,11 @@ public class TaskList {
         return tasks.get(index);
     }
 
-    /** Returns how many tasks are in the list. */
+    /**
+     * Returns how many tasks are in the list.
+     *
+     * @return the number of tasks.
+     */
     public int size() {
         return tasks.size();
     }
@@ -95,6 +100,8 @@ public class TaskList {
 
     /**
      * Returns the tasks as a plain list, in order, for display or saving.
+     *
+     * @return an unmodifiable copy of the tasks.
      */
     public List<Task> asList() {
         return List.copyOf(tasks);

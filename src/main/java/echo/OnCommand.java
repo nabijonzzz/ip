@@ -6,6 +6,7 @@ import java.time.LocalDate;
  * Shows the deadlines due on, and the events spanning, a given date.
  */
 public class OnCommand extends Command {
+    /** The date whose deadlines and events to show. */
     private final LocalDate date;
 
     /**

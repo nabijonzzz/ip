@@ -8,6 +8,10 @@ import java.io.UncheckedIOException;
  */
 public abstract class Command {
 
+    /** Creates a command; subclasses store whatever arguments they need. */
+    protected Command() {
+    }
+
     /**
      * Carries out this command.
      *
@@ -21,6 +25,8 @@ public abstract class Command {
     /**
      * Returns whether the program should stop after this command.
      * Only the exit command returns {@code true}.
+     *
+     * @return {@code true} if the main loop should end after this command.
      */
     public boolean isExit() {
         return false;

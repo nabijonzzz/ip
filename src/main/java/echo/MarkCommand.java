@@ -4,9 +4,12 @@ package echo;
  * Marks the task at a given list position as done.
  */
 public class MarkCommand extends Command {
+    /** 1-based position of the task to mark, as typed by the user. */
     private final int taskNumber;
 
     /**
+     * Creates a command that marks the task at the given position as done.
+     *
      * @param taskNumber 1-based position shown by the list command.
      */
     public MarkCommand(int taskNumber) {

@@ -6,7 +6,9 @@ import java.time.LocalDate;
  * Represents an event: a task that spans from a start date to an end date.
  */
 public class Event extends Task {
+    /** The date the event starts. */
     private final LocalDate from;
+    /** The date the event ends; never before {@link #from}. */
     private final LocalDate to;
 
     /**

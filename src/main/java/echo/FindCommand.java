@@ -4,6 +4,7 @@ package echo;
  * Shows the tasks whose description contains a given keyword.
  */
 public class FindCommand extends Command {
+    /** The text to look for in task descriptions. */
     private final String keyword;
 
     /**
