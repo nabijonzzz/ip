@@ -1,13 +1,42 @@
 package echo;
 
 /**
- * Turns raw user input into validated command arguments. Every method either
- * returns the parsed result or throws {@link EchoException} with a
+ * Turns raw user input into a {@link Command} ready to execute. Every method
+ * either returns the parsed result or throws {@link EchoException} with a
  * user-facing explanation -- this class never prints anything itself.
  */
 public class Parser {
 
     private Parser() {
+    }
+
+    /**
+     * Parses one line of user input into the command it describes.
+     *
+     * @param fullCommand the full line the user typed, or {@code null} if input has ended.
+     * @return the command to execute; end of input is treated as {@code bye}.
+     * @throws EchoException if the line is not a recognized command, or its arguments are invalid.
+     */
+    public static Command parse(String fullCommand) throws EchoException {
+        if (fullCommand == null || fullCommand.equals("bye")) {
+            return new ExitCommand();
+        } else if (fullCommand.equals("list")) {
+            return new ListCommand();
+        } else if (fullCommand.equals("mark") || fullCommand.startsWith("mark ")) {
+            return new MarkCommand(parseTaskNumber(fullCommand, "mark"));
+        } else if (fullCommand.equals("unmark") || fullCommand.startsWith("unmark ")) {
+            return new UnmarkCommand(parseTaskNumber(fullCommand, "unmark"));
+        } else if (fullCommand.equals("delete") || fullCommand.startsWith("delete ")) {
+            return new DeleteCommand(parseTaskNumber(fullCommand, "delete"));
+        } else if (fullCommand.equals("todo") || fullCommand.startsWith("todo ")) {
+            return new AddCommand(new Todo(requireDescription(fullCommand, "todo", "a todo")));
+        } else if (fullCommand.equals("deadline") || fullCommand.startsWith("deadline ")) {
+            return new AddCommand(parseDeadline(fullCommand));
+        } else if (fullCommand.equals("event") || fullCommand.startsWith("event ")) {
+            return new AddCommand(parseEvent(fullCommand));
+        } else {
+            throw new EchoException("I'm sorry, but I don't know what that means :-(");
+        }
     }
 
     /**
@@ -20,7 +49,7 @@ public class Parser {
      * @return the trimmed, non-empty description.
      * @throws EchoException if no description follows the command word.
      */
-    public static String requireDescription(String userInput, String commandWord, String taskNounPhrase)
+    private static String requireDescription(String userInput, String commandWord, String taskNounPhrase)
             throws EchoException {
         String description = userInput.equals(commandWord)
                 ? ""
@@ -39,7 +68,7 @@ public class Parser {
      * @return the parsed deadline.
      * @throws EchoException if the description or the {@code /by} part is missing.
      */
-    public static Deadline parseDeadline(String userInput) throws EchoException {
+    private static Deadline parseDeadline(String userInput) throws EchoException {
         String description = requireDescription(userInput, "deadline", "a deadline");
         String[] parts = description.split(" /by ", 2);
         if (parts.length < 2 || parts[1].trim().isEmpty()) {
@@ -60,7 +89,7 @@ public class Parser {
      * @return the parsed event.
      * @throws EchoException if the description, {@code /from} or {@code /to} part is missing.
      */
-    public static Event parseEvent(String userInput) throws EchoException {
+    private static Event parseEvent(String userInput) throws EchoException {
         String description = requireDescription(userInput, "event", "an event");
         String[] fromParts = description.split(" /from ", 2);
         if (fromParts.length < 2 || fromParts[1].trim().isEmpty()) {
@@ -79,15 +108,16 @@ public class Parser {
     }
 
     /**
-     * Parses and validates the task number after {@code mark}/{@code unmark}/{@code delete}.
+     * Parses the task number after {@code mark}/{@code unmark}/{@code delete}.
+     * Whether a task with that number exists is checked later by the command,
+     * which has access to the task list.
      *
      * @param userInput the full command line, e.g. {@code "mark 2"}.
      * @param command   the command word, e.g. {@code "mark"}, {@code "unmark"} or {@code "delete"}.
-     * @param taskCount how many tasks currently exist, for bounds checking.
-     * @return the 1-based task number, guaranteed to be in {@code [1, taskCount]}.
-     * @throws EchoException if the number is missing, not a number, or out of range.
+     * @return the 1-based task number as typed.
+     * @throws EchoException if the number is missing or not a number.
      */
-    public static int parseTaskNumber(String userInput, String command, int taskCount) throws EchoException {
+    private static int parseTaskNumber(String userInput, String command) throws EchoException {
         String argument = userInput.equals(command)
                 ? ""
                 : userInput.substring(command.length() + 1).trim();
@@ -95,15 +125,10 @@ public class Parser {
             throw new EchoException("Tell me which task number to " + command
                     + ", e.g. \"" + command + " 2\".");
         }
-        int taskNumber;
         try {
-            taskNumber = Integer.parseInt(argument);
+            return Integer.parseInt(argument);
         } catch (NumberFormatException e) {
             throw new EchoException("\"" + argument + "\" is not a task number.");
         }
-        if (taskNumber < 1 || taskNumber > taskCount) {
-            throw new EchoException("There is no task number " + taskNumber + " in the list.");
-        }
-        return taskNumber;
     }
 }
