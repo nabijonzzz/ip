@@ -60,6 +60,22 @@ public class TaskList {
     }
 
     /**
+     * Returns the tasks whose description contains the given keyword, in list order.
+     *
+     * @param keyword the text to look for; matching is case-sensitive.
+     * @return the matching tasks, possibly empty.
+     */
+    public List<Task> find(String keyword) {
+        List<Task> matches = new ArrayList<>();
+        for (Task task : tasks) {
+            if (task.containsKeyword(keyword)) {
+                matches.add(task);
+            }
+        }
+        return matches;
+    }
+
+    /**
      * Returns the tasks as a plain list, in order, for display or saving.
      */
     public List<Task> asList() {

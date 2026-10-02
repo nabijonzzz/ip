@@ -62,12 +62,31 @@ public class Ui {
      * @param tasks the tasks to display, in order.
      */
     public void showTaskList(List<Task> tasks) {
-        StringBuilder taskList = new StringBuilder("Here are the tasks in your list:");
+        showNumberedTasks("Here are the tasks in your list:", tasks);
+    }
+
+    /**
+     * Prints the tasks found by the {@code find} command, numbered from 1.
+     *
+     * @param matches the matching tasks, in list order.
+     */
+    public void showMatchingTasks(List<Task> matches) {
+        showNumberedTasks("Here are the matching tasks in your list:", matches);
+    }
+
+    /**
+     * Prints a heading followed by the given tasks, one per line, numbered from 1.
+     *
+     * @param heading the line to print above the tasks.
+     * @param tasks   the tasks to print, in order.
+     */
+    private void showNumberedTasks(String heading, List<Task> tasks) {
+        StringBuilder text = new StringBuilder(heading);
         for (int i = 0; i < tasks.size(); i++) {
-            taskList.append(System.lineSeparator())
+            text.append(System.lineSeparator())
                     .append(i + 1).append(".").append(tasks.get(i));
         }
-        showMessage(taskList.toString());
+        showMessage(text.toString());
     }
 
     /**

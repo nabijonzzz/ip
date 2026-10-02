@@ -22,6 +22,8 @@ public class Parser {
             return new ExitCommand();
         } else if (fullCommand.equals("list")) {
             return new ListCommand();
+        } else if (fullCommand.equals("find") || fullCommand.startsWith("find ")) {
+            return new FindCommand(parseKeyword(fullCommand));
         } else if (fullCommand.equals("mark") || fullCommand.startsWith("mark ")) {
             return new MarkCommand(parseTaskNumber(fullCommand, "mark"));
         } else if (fullCommand.equals("unmark") || fullCommand.startsWith("unmark ")) {
@@ -105,6 +107,23 @@ public class Parser {
                     + "\"event meeting /from Mon 2pm /to 4pm\".");
         }
         return new Event(fromParts[0].trim(), toParts[0].trim(), toParts[1].trim());
+    }
+
+    /**
+     * Returns the keyword after {@code find}, rejecting it if empty.
+     *
+     * @param userInput the full command line starting with {@code find}.
+     * @return the trimmed, non-empty keyword.
+     * @throws EchoException if no keyword follows {@code find}.
+     */
+    private static String parseKeyword(String userInput) throws EchoException {
+        String keyword = userInput.equals("find")
+                ? ""
+                : userInput.substring("find ".length()).trim();
+        if (keyword.isEmpty()) {
+            throw new EchoException("Tell me what to search for, e.g. \"find book\".");
+        }
+        return keyword;
     }
 
     /**
