@@ -3,7 +3,6 @@ package echo;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 /**
  * Echo is a command-line chatbot that manages a simple task list.
@@ -16,47 +15,56 @@ import java.util.Scanner;
  * task list is saved to disk after every change and reloaded at startup.
  */
 public class Echo {
-    private static final String LINE = "____________________________________________________________";
-    private static final String BANNER = " _____ ____ _   _  ___  \n"
-            + "| ____/ ___| | | |/ _ \\ \n"
-            + "|  _|| |   | |_| | | | |\n"
-            + "| |__| |___|  _  | |_| |\n"
-            + "|_____\\____|_| |_|\\___/ \n";
-    private static final String NAME = "Echo";
+    private final List<Task> tasks = new ArrayList<>();
+    private final Storage storage;
+    private final Ui ui;
 
-    private static final List<Task> tasks = new ArrayList<>();
-    private static final Storage storage = new Storage("data/echo.txt");
+    /**
+     * Creates an Echo chatbot backed by the given save file, loading any
+     * tasks already saved there.
+     *
+     * @param filePath path (relative to the project root) of the save file.
+     */
+    public Echo(String filePath) {
+        ui = new Ui();
+        storage = new Storage(filePath);
+        tasks.addAll(storage.load());
+    }
 
-    public static void main(String[] args) {
-        printGreeting();
-        loadTasks();
-        Scanner scanner = new Scanner(System.in);
-
-        while (scanner.hasNextLine()) {
-            String userInput = scanner.nextLine();
-            if (userInput.equals("bye")) {
+    /**
+     * Greets the user, then repeatedly reads and acts on one command line at
+     * a time until the user types {@code bye} or input ends.
+     */
+    public void run() {
+        ui.showGreeting();
+        while (true) {
+            String userInput = ui.readCommand();
+            if (userInput == null || userInput.equals("bye")) {
                 break;
             }
             try {
                 handleCommand(userInput);
             } catch (EchoException e) {
-                printMessage("OOPS!!! " + e.getMessage());
+                ui.showError(e.getMessage());
             }
         }
-        printMessage("Bye. Hope to see you again soon!");
+        ui.showGoodbye();
+    }
+
+    public static void main(String[] args) {
+        new Echo("data/echo.txt").run();
     }
 
     /**
-     * Dispatches one command line to its handler. The caller has already
-     * checked for {@code bye}, so that command is not handled here.
+     * Dispatches one command line to its handler.
      *
      * @param userInput the full line the user typed.
      * @throws EchoException if the line is not a recognized command, or the
      *                       command is recognized but its arguments are invalid.
      */
-    private static void handleCommand(String userInput) throws EchoException {
+    private void handleCommand(String userInput) throws EchoException {
         if (userInput.equals("list")) {
-            printAllTasks();
+            ui.showTaskList(tasks);
         } else if (userInput.equals("mark") || userInput.startsWith("mark ")) {
             markTask(parseTaskNumber(userInput, "mark"));
         } else if (userInput.equals("unmark") || userInput.startsWith("unmark ")) {
@@ -75,26 +83,13 @@ public class Echo {
     }
 
     /**
-     * Prints the greeting banner and the welcome message.
-     */
-    private static void printGreeting() {
-        System.out.println(LINE);
-        System.out.println(BANNER);
-        System.out.println("Hello! I'm " + NAME + ".");
-        System.out.println("What can I do for you?");
-        System.out.println(LINE);
-    }
-
-    /**
      * Stores a task and confirms it to the user with the running total.
      *
      * @param task the task to add.
      */
-    private static void addTask(Task task) {
+    private void addTask(Task task) {
         tasks.add(task);
-        printMessage("Got it. I've added this task:" + System.lineSeparator()
-                + "  " + task + System.lineSeparator()
-                + "Now you have " + tasks.size() + " tasks in the list.");
+        ui.showTaskAdded(task, tasks.size());
         saveTasks();
     }
 
@@ -104,19 +99,10 @@ public class Echo {
      *
      * @param taskNumber 1-based position shown by the list command.
      */
-    private static void deleteTask(int taskNumber) {
+    private void deleteTask(int taskNumber) {
         Task removed = tasks.remove(taskNumber - 1);
-        printMessage("Noted. I've removed this task:" + System.lineSeparator()
-                + "  " + removed + System.lineSeparator()
-                + "Now you have " + tasks.size() + " tasks in the list.");
+        ui.showTaskDeleted(removed, tasks.size());
         saveTasks();
-    }
-
-    /**
-     * Loads previously saved tasks (if any) into the in-memory list at startup.
-     */
-    private static void loadTasks() {
-        tasks.addAll(storage.load());
     }
 
     /**
@@ -124,11 +110,11 @@ public class Echo {
      * user rather than crashing the program -- the in-memory list is still
      * intact even if the save itself did not succeed.
      */
-    private static void saveTasks() {
+    private void saveTasks() {
         try {
             storage.save(tasks);
         } catch (UncheckedIOException e) {
-            printMessage("OOPS!!! Could not save your tasks: " + e.getCause().getMessage());
+            ui.showError("Could not save your tasks: " + e.getCause().getMessage());
         }
     }
 
@@ -142,7 +128,7 @@ public class Echo {
      * @return the trimmed, non-empty description.
      * @throws EchoException if no description follows the command word.
      */
-    private static String requireDescription(String userInput, String commandWord, String taskNounPhrase)
+    private String requireDescription(String userInput, String commandWord, String taskNounPhrase)
             throws EchoException {
         String description = userInput.equals(commandWord)
                 ? ""
@@ -161,7 +147,7 @@ public class Echo {
      * @return the parsed deadline.
      * @throws EchoException if the description or the {@code /by} part is missing.
      */
-    private static Deadline parseDeadline(String userInput) throws EchoException {
+    private Deadline parseDeadline(String userInput) throws EchoException {
         String description = requireDescription(userInput, "deadline", "a deadline");
         String[] parts = description.split(" /by ", 2);
         if (parts.length < 2 || parts[1].trim().isEmpty()) {
@@ -182,7 +168,7 @@ public class Echo {
      * @return the parsed event.
      * @throws EchoException if the description, {@code /from} or {@code /to} part is missing.
      */
-    private static Event parseEvent(String userInput) throws EchoException {
+    private Event parseEvent(String userInput) throws EchoException {
         String description = requireDescription(userInput, "event", "an event");
         String[] fromParts = description.split(" /from ", 2);
         if (fromParts.length < 2 || fromParts[1].trim().isEmpty()) {
@@ -201,19 +187,6 @@ public class Echo {
     }
 
     /**
-     * Prints every stored task as a numbered list, in response to the
-     * {@code list} command.
-     */
-    private static void printAllTasks() {
-        StringBuilder taskList = new StringBuilder("Here are the tasks in your list:");
-        for (int i = 0; i < tasks.size(); i++) {
-            taskList.append(System.lineSeparator())
-                    .append(i + 1).append(".").append(tasks.get(i));
-        }
-        printMessage(taskList.toString());
-    }
-
-    /**
      * Parses and validates the task number after {@code mark}/{@code unmark}/{@code delete}.
      *
      * @param userInput the full command line, e.g. {@code "mark 2"}.
@@ -221,7 +194,7 @@ public class Echo {
      * @return the 1-based task number, guaranteed to point at an existing task.
      * @throws EchoException if the number is missing, not a number, or out of range.
      */
-    private static int parseTaskNumber(String userInput, String command) throws EchoException {
+    private int parseTaskNumber(String userInput, String command) throws EchoException {
         String argument = userInput.equals(command)
                 ? ""
                 : userInput.substring(command.length() + 1).trim();
@@ -246,11 +219,10 @@ public class Echo {
      *
      * @param taskNumber 1-based position shown by the list command.
      */
-    private static void markTask(int taskNumber) {
+    private void markTask(int taskNumber) {
         Task task = tasks.get(taskNumber - 1);
         task.markAsDone();
-        printMessage("Nice! I've marked this task as done:" + System.lineSeparator()
-                + "  " + task);
+        ui.showTaskStatusChanged(task, true);
         saveTasks();
     }
 
@@ -259,22 +231,10 @@ public class Echo {
      *
      * @param taskNumber 1-based position shown by the list command.
      */
-    private static void unmarkTask(int taskNumber) {
+    private void unmarkTask(int taskNumber) {
         Task task = tasks.get(taskNumber - 1);
         task.markAsNotDone();
-        printMessage("OK, I've marked this task as not done yet:" + System.lineSeparator()
-                + "  " + task);
+        ui.showTaskStatusChanged(task, false);
         saveTasks();
-    }
-
-    /**
-     * Prints a message framed between two divider lines.
-     *
-     * @param message text to display between the dividers.
-     */
-    private static void printMessage(String message) {
-        System.out.println(LINE);
-        System.out.println(message);
-        System.out.println(LINE);
     }
 }
