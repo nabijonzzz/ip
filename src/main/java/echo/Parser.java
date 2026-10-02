@@ -64,23 +64,23 @@ public class Parser {
 
     /**
      * Parses the text after {@code deadline }, of the form
-     * {@code <description> /by <when>}.
+     * {@code <description> /by <yyyy-mm-dd>}.
      *
      * @param userInput the full command line starting with {@code deadline}.
      * @return the parsed deadline.
-     * @throws EchoException if the description or the {@code /by} part is missing.
+     * @throws EchoException if the description or the {@code /by} date is missing or invalid.
      */
     private static Deadline parseDeadline(String userInput) throws EchoException {
         String description = requireDescription(userInput, "deadline", "a deadline");
         String[] parts = description.split(" /by ", 2);
         if (parts.length < 2 || parts[1].trim().isEmpty()) {
-            throw new EchoException("A deadline needs a due date/time, e.g. "
-                    + "\"deadline return book /by Sunday\".");
+            throw new EchoException("A deadline needs a due date, e.g. "
+                    + "\"deadline return book /by 2019-10-15\".");
         }
         if (parts[0].trim().isEmpty()) {
             throw new EchoException("The description of a deadline cannot be empty.");
         }
-        return new Deadline(parts[0].trim(), parts[1].trim());
+        return new Deadline(parts[0].trim(), Dates.parse(parts[1].trim()));
     }
 
     /**

@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,7 +53,8 @@ public class Storage {
      * Parses one save-file line into a task.
      *
      * @param line one line from the save file.
-     * @return the parsed task, or {@code null} if the line is corrupted.
+     * @return the parsed task, or {@code null} if the line is corrupted
+     *         (including a date that is not in {@code yyyy-mm-dd} form).
      */
     private Task parseLine(String line) {
         String[] fields = line.split(" \\| ");
@@ -62,23 +65,27 @@ public class Storage {
         boolean isDone = fields[1].equals("1");
         String description = fields[2];
         Task task;
-        switch (type) {
-        case "T":
-            task = new Todo(description);
-            break;
-        case "D":
-            if (fields.length < 4) {
+        try {
+            switch (type) {
+            case "T":
+                task = new Todo(description);
+                break;
+            case "D":
+                if (fields.length < 4) {
+                    return null;
+                }
+                task = new Deadline(description, LocalDate.parse(fields[3]));
+                break;
+            case "E":
+                if (fields.length < 5) {
+                    return null;
+                }
+                task = new Event(description, fields[3], fields[4]);
+                break;
+            default:
                 return null;
             }
-            task = new Deadline(description, fields[3]);
-            break;
-        case "E":
-            if (fields.length < 5) {
-                return null;
-            }
-            task = new Event(description, fields[3], fields[4]);
-            break;
-        default:
+        } catch (DateTimeParseException e) {
             return null;
         }
         if (isDone) {
